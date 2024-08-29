@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers - Hoke Financial</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Careers</h1>
+    </header>
+
+    <section class="intro">
+        <p>At Hoke Financial, we are always looking for talented and driven individuals to join our team. Explore our open positions and see how you can make an impact.</p>
+    </section>
+
+    <section class="jobs">
+        <h2>Current Openings</h2>
+        <div class="job-listing">
+            <h3>Business Development Intern</h3>
+            <p>Location: Remote (Various Locations)</p>
+            <p>Hoke Financial is offering a unique opportunity for college students to gain hands-on experience in sales and lead generation. As an intern, you will be responsible for identifying and reaching out to potential clients, assisting in lead cultivation, and working closely with our regional managers to drive business growth.</p>
+            <ul>
+                <li>Currently enrolled in a college or university</li>
+                <li>Strong interest in sales and financial services</li>
+                <li>Excellent communication skills and a proactive attitude</li>
+                <li>Ability to work independently and as part of a team</li>
+                <li>Flexible schedule with the ability to work part-time</li>
+            </ul>
+            <button class="apply-btn" onclick="showModal('Part-Time Sales/Lead Generation Intern')">Apply Now</button>
+        </div>        
+        <div class="job-listing">
+            <h3>Client Engagement Manager</h3>
+            <p>Location: Remote (Various Locations)</p>
+            <p>Hoke Financial is seeking a Client Engagement Manager to bridge the gap between our sales team and technical specialists. This role focuses on nurturing client relationships, ensuring seamless communication between departments, and delivering tailored solutions to meet client needs.</p>
+            <ul>
+                <li>3+ years of experience in client management or business development</li>
+                <li>Strong communication and relationship-building skills</li>
+                <li>Experience working with cross-functional teams to deliver client-focused solutions</li>
+                <li>Ability to manage multiple tasks and projects simultaneously</li>
+                <li>Highly organized and detail-oriented</li>
+            </ul>
+            <button class="apply-btn" onclick="showModal('Client Engagement Manager')">Apply Now</button>
+        </div>        
+        <div class="job-listing">
+            <h3>Data Analyst - AI/ML Specialist</h3>
+            <p>Location: Remote</p>
+            <p>Hoke Financial is seeking a skilled Data Analyst to join our tech team. This role will focus on supporting the development and optimization of our AI-driven technologies. The ideal candidate will have a strong background in data analysis and experience working with AI or machine learning models.</p>
+            <ul>
+                <li>3+ years of experience in data analysis or a related field</li>
+                <li>Strong proficiency in Python for data analysis</li>
+                <li>Experience working with AI or machine learning models</li>
+                <li>Ability to work closely with data scientists and engineers to refine algorithms</li>
+                <li>Strong analytical skills with the ability to translate data insights into actionable recommendations</li>
+                <li>Experience with data visualization tools (e.g., Tableau, Power BI) is a plus</li>
+            </ul>
+            <button class="apply-btn" onclick="showModal('Data Analyst - AI & Credit Servicing')">Apply Now</button>
+        </div>
+        
+        <!-- Add more job listings as needed -->
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Hoke Financial. All rights reserved.</p>
+    </footer>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-job-title">Apply for Job Title</h2>
+            <form>
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="resume">Upload Resume:</label>
+                <input type="file" id="resume" name="resume" required>
+
+                <input type="submit" value="Submit Application">
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
