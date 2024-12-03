@@ -1,2 +1,19 @@
-javascript:(async()=>{const decodeBase32=(base32=>{const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';let bits='';let decoded='';for(let i=0;i<base32.length;i++){const char=base32[i].toUpperCase();if(char==='=')break;const index=alphabet.indexOf(char);if(index===-1)continue;bits+=index.toString(2).padStart(5,'0');}for(let i=0;i<bits.length;i+=8){const byte=bits.substring(i,i+8);if(byte.length===8){decoded+=String.fromCharCode(parseInt(byte,2));}}return new Uint8Array([...decoded].map(c=>c.charCodeAt(0)));});const generateTOTP=async(secret=>{try{const epoch=Math.floor(new Date().getTime()/1000);console.log('Epoch (UTC Seconds):',epoch);const timeStep=Math.floor(epoch/30);console.log('Time Step:',timeStep);const crypto=window.crypto||window.msCrypto;const key=decodeBase32(secret);console.log('Decoded Key:',key);const timeBytes=new Uint8Array(8);let tempTime=timeStep;for(let index=7;index>=0;index--){timeBytes[index]=tempTime&0xff;tempTime>>=8;}console.log('Time Bytes:',timeBytes);const hmacKey=await crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-1'},false,['sign']);const signature=new Uint8Array(await crypto.subtle.sign('HMAC',hmacKey,timeBytes));console.log('HMAC Signature:',signature);
-const offset=signature[19]&0xf;console.log('Offset:',offset);const otp=((new DataView(signature.buffer).getUint32(offset)&0x7fffffff)%1000000).toString();console.log('Generated OTP:',otp);return otp.padStart(6,'0');}catch(error){console.error('Error in generateTOTP:',error.message);return undefined;}});const secret='YOUR_SECRET_BASE32';const otp=await generateTOTP(secret);if(otp){alert('Final OTP: '+otp);}else{alert('Failed to generate OTP.');}})();
+(async () => {
+  try {
+    // URL of your Flask server
+    const url = "http://127.0.0.1:5000/generate-otp"; // Change to your Flask server URL
+
+    // Fetch OTP from Flask server
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    console.log("Generated OTP:", data.otp);
+
+    // Display the OTP
+    alert(`Generated OTP: ${data.otp}`);
+  } catch (error) {
+    console.error("Error fetching OTP:", error);
+    alert("Failed to fetch OTP. Check the console for details.");
+  }
+})();
