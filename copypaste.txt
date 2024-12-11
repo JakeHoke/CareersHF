@@ -1,1 +1,1 @@
-javascript:(async()=>{try{const url="http://127.0.0.1:5000/generate-otp";const response=await fetch(url);if(!response.ok)throw new Error(`HTTP error! Status: ${response.status}`);const data=await response.json();const otp=data.otp;await navigator.clipboard.writeText(otp);alert(`OTP copied to clipboard: ${otp}`);}catch(error){console.error("Error fetching OTP:",error);alert("Failed to fetch OTP. Check the console for details.");}})();
+=IF(SEQUENCE(1, OFFSET(O2, ROW()-ROW($U$2), 0) + 1) <= OFFSET(O2, ROW()-ROW($U$2), 0) + 1, COUNT(O$2:OFFSET(O2, ROW()-ROW($U$2), 0)), "")
