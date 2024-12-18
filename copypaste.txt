@@ -1,109 +1,114 @@
-from flask import Flask, jsonify, request
-from redis import Redis
-from rq import Queue
-import uuid
-import time
+from flask import Flask, jsonify, request, render_template
+import subprocess
+import tempfile
+import os
+import requests
+import json
+
+# Load configuration from JSON file
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)
+
+# Assign variables from config
+WORKER_ID = config["worker_id"]
+ORCHESTRATOR_URL = config["orchestrator_url"]
+PORT = config["port"]
 
 app = Flask(__name__)
+worker_status = "idle"
 
-# Redis setup
-redis_conn = Redis(host="localhost", port=6379, decode_responses=True)
+# Register the worker with the orchestrator immediately on script start
+try:
+    response = requests.post(f"{ORCHESTRATOR_URL}/register", json={"worker_id": WORKER_ID})
+    if response.status_code == 200:
+        print(f"Worker {WORKER_ID} registered successfully.")
+    else:
+        print(f"Failed to register worker {WORKER_ID}: {response.json()}")
+except Exception as e:
+    print(f"Error registering worker: {e}")
 
-# Task queue
-task_queue = Queue("tasks", connection=redis_conn)
-
-# In-memory storage for workers and tasks
-workers = {}  # worker_id -> {"status": "idle" or "busy", "last_seen": timestamp}
-tasks = {}  # task_id -> {"file_name": str, "status": str, "worker": str, "result": dict}
-
-@app.route("/register", methods=["POST"])
-def register_worker():
-    """Register a new worker node."""
-    worker_id = request.json.get("worker_id")
-    if not worker_id:
-        return jsonify({"error": "worker_id is required"}), 400
-
-    workers[worker_id] = {"status": "idle", "last_seen": time.time()}
-    return jsonify({"message": f"Worker {worker_id} registered successfully"}), 200
-
-@app.route("/submit", methods=["POST"])
-def submit_task():
-    """Submit a new task."""
-    data = request.json
-    file_name = data.get("file_name")
-    file_content = data.get("file_content")
-
-    if not file_name or not file_content:
-        return jsonify({"error": "file_name and file_content are required"}), 400
-
-    # Create a new task
-    task_id = str(uuid.uuid4())
-    tasks[task_id] = {
-        "file_name": file_name,
-        "status": "queued",
-        "worker": None,
-        "result": None,
-    }
-
-    # Distribute the task to the first available worker
-    assigned_worker = None
-    for worker_id, worker_info in workers.items():
-        if worker_info["status"] == "idle":
-            # Send task to this worker
-            try:
-                response = requests.post(
-                    f"http://{worker_id}:5000/process",
-                    json={"task_id": task_id, "file_content": file_content},
-                )
-                if response.status_code == 200:
-                    workers[worker_id]["status"] = "busy"
-                    workers[worker_id]["last_seen"] = time.time()
-                    tasks[task_id]["worker"] = worker_id
-                    tasks[task_id]["status"] = "processing"
-                    assigned_worker = worker_id
-                    break
-            except Exception as e:
-                print(f"Failed to send task to worker {worker_id}: {e}")
-
-    if not assigned_worker:
-        return jsonify({"message": "No available workers, task queued"}), 202
-
-    return jsonify({
-        "message": f"Task {task_id} assigned to worker {assigned_worker}",
-        "task_id": task_id
-    }), 201
-
-@app.route("/update", methods=["POST"])
-def update_task():
-    """Update task status from a worker node."""
-    data = request.json
-    task_id = data.get("task_id")
-    worker_id = data.get("worker_id")
-    status = data.get("status")
-    result = data.get("result")
-
-    if not task_id or not worker_id or not status:
-        return jsonify({"error": "task_id, worker_id, and status are required"}), 400
-
-    if task_id in tasks:
-        tasks[task_id]["status"] = status
-        tasks[task_id]["result"] = result
-        workers[worker_id]["status"] = "idle"  # Mark worker as idle again
-        workers[worker_id]["last_seen"] = time.time()
-        return jsonify({"message": f"Task {task_id} updated successfully"}), 200
-
-    return jsonify({"error": "Task not found"}), 404
-
-@app.route("/nodes", methods=["GET"])
-def list_workers():
-    """List all registered workers and their statuses."""
-    return jsonify(workers)
+@app.route("/")
+def index():
+    """Render the HTML file upload form."""
+    return render_template("upload.html")
 
 @app.route("/status", methods=["GET"])
-def list_tasks():
-    """List the status of all tasks."""
-    return jsonify(tasks)
+def status():
+    """Return the current status of the worker."""
+    return jsonify({"worker_id": WORKER_ID, "status": worker_status})
+
+@app.route("/process", methods=["POST"])
+def process_task():
+    """Process a task sent by the orchestrator."""
+    global worker_status
+
+    data = request.json
+    task_id = data.get("task_id")
+    file_content = data.get("file_content")
+
+    if not task_id or not file_content:
+        return jsonify({"status": "failure", "error": "Missing task_id or file_content"}), 400
+
+    print(f"Received task {task_id}...")
+    worker_status = "working"
+
+    # Notify orchestrator that the task has been received and is being worked on
+    try:
+        requests.post(
+            f"{ORCHESTRATOR_URL}/update",
+            json={
+                "task_id": task_id,
+                "worker_id": WORKER_ID,
+                "status": "working",  # Notify that the task is being worked on
+                "result": None,  # No result yet, as it's just acknowledgment
+            },
+        )
+    except Exception as e:
+        print(f"Error sending acknowledgment to orchestrator: {e}")
+
+    # Save and execute the file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp_file:
+        temp_file.write(file_content.encode())
+        temp_filepath = temp_file.name
+
+    try:
+        result = subprocess.run(
+            ["python3", temp_filepath],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=10
+        )
+        output = result.stdout.decode()
+        errors = result.stderr.decode()
+        status = "success" if not errors else "failure"
+    except subprocess.TimeoutExpired:
+        output = ""
+        errors = "Execution timed out."
+        status = "failure"
+    except Exception as e:
+        output = ""
+        errors = str(e)
+        status = "failure"
+    finally:
+        os.remove(temp_filepath)
+
+    # Notify orchestrator of the task result
+    try:
+        requests.post(
+            f"{ORCHESTRATOR_URL}/update",
+            json={
+                "task_id": task_id,
+                "worker_id": WORKER_ID,
+                "status": status,  # Final task status: success or failure
+                "result": {"output": output, "errors": errors},
+            },
+        )
+    except Exception as e:
+        print(f"Error updating orchestrator with task result: {e}")
+
+    worker_status = "idle"
+    return jsonify({"status": status, "output": output, "errors": errors})
 
 if __name__ == "__main__":
-    print("Starting orchestrator server...")
-    app.run(host="0.0.0.0", port=5000)
+    print("Starting Flask server...")
+    app.run(host="0.0.0.0", port=PORT)
