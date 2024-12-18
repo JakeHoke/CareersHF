@@ -1,1 +1,176 @@
-=IF(SEQUENCE(1, OFFSET(O2, ROW()-ROW($U$2), 0) + 1) <= OFFSET(O2, ROW()-ROW($U$2), 0) + 1, COUNT(O$2:OFFSET(O2, ROW()-ROW($U$2), 0)), "")
+from flask import Flask, jsonify, request, render_template
+import subprocess
+import tempfile
+import os
+import requests
+import time
+import threading
+
+# Worker node configuration
+WORKER_ID = "worker-1"  # Unique ID for this worker
+ORCHESTRATOR_URL = "http://localhost:5000"  # Orchestrator endpoint
+
+# Flask app for worker node
+app = Flask(__name__)
+
+# Worker status
+worker_status = "idle"
+
+# Register this worker with the orchestrator
+def register_worker():
+    try:
+        response = requests.post(f"{ORCHESTRATOR_URL}/register", json={"worker_id": WORKER_ID})
+        if response.status_code == 200:
+            print(f"Worker {WORKER_ID} registered successfully.")
+        else:
+            print(f"Failed to register worker {WORKER_ID}: {response.json()}")
+    except Exception as e:
+        print(f"Error registering worker: {e}")
+
+# Function to process tasks
+def process_task(task_id, file_content):
+    global worker_status
+    worker_status = "busy"
+
+    # Create a temporary file for the Python code
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp_file:
+        temp_file.write(file_content.encode())
+        temp_filepath = temp_file.name
+
+    try:
+        # Execute the Python file
+        result = subprocess.run(
+            ["python3", temp_filepath],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=10
+        )
+        output = result.stdout.decode()
+        errors = result.stderr.decode()
+        status = "success" if not errors else "failure"
+    except subprocess.TimeoutExpired:
+        output = ""
+        errors = "Execution timed out."
+        status = "failure"
+    except Exception as e:
+        output = ""
+        errors = str(e)
+        status = "failure"
+    finally:
+        # Clean up the temporary file
+        try:
+            os.remove(temp_filepath)
+        except Exception as e:
+            print(f"Error deleting temp file: {e}")
+
+    # Notify the orchestrator about the task result
+    try:
+        requests.post(
+            f"{ORCHESTRATOR_URL}/update",
+            json={
+                "task_id": task_id,
+                "worker_id": WORKER_ID,
+                "status": status,
+                "result": {"output": output, "errors": errors},
+            },
+        )
+    except Exception as e:
+        print(f"Error updating orchestrator: {e}")
+
+    # Mark the worker as idle
+    worker_status = "idle"
+
+# Background thread to poll for tasks
+def poll_for_tasks():
+    global worker_status
+    while True:
+        if worker_status == "idle":
+            try:
+                # Poll the orchestrator for tasks
+                response = requests.get(f"{ORCHESTRATOR_URL}/poll", params={"worker_id": WORKER_ID})
+                if response.status_code == 200:
+                    task = response.json()
+                    if task.get("task_id") and task.get("file_content"):
+                        # Process the received task
+                        process_task(task["task_id"], task["file_content"])
+            except Exception as e:
+                print(f"Error polling orchestrator: {e}")
+
+        time.sleep(2)  # Polling interval
+
+# Flask endpoints
+@app.route("/")
+def index():
+    """Render the HTML file upload form."""
+    return render_template("upload.html")
+
+@app.route("/status", methods=["GET"])
+def status():
+    """Return the current status of the worker."""
+    return jsonify({"worker_id": WORKER_ID, "status": worker_status})
+
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    """Handle .py file uploads and execute them temporarily (for testing purposes)."""
+    global worker_status
+    if "file" not in request.files:
+        return jsonify({"status": "failure", "error": "No file part in the request"}), 400
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        return jsonify({"status": "failure", "error": "No file selected"}), 400
+
+    if file.filename and not file.filename.endswith(".py"):
+        return jsonify({"status": "failure", "error": "Only .py files are allowed"}), 400
+
+    # Create a temporary file to save and execute the uploaded file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp_file:
+        temp_file.write(file.read())
+        temp_filepath = temp_file.name
+
+    worker_status = "busy"
+
+    try:
+        # Execute the temporary file
+        result = subprocess.run(
+            ["python3", temp_filepath],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=10
+        )
+        output = result.stdout.decode()
+        errors = result.stderr.decode()
+        status = "success" if not errors else "failure"
+    except subprocess.TimeoutExpired:
+        output = ""
+        errors = "Execution timed out."
+        status = "failure"
+    except Exception as e:
+        output = ""
+        errors = str(e)
+        status = "failure"
+    finally:
+        # Delete the temporary file
+        try:
+            os.remove(temp_filepath)
+        except Exception as e:
+            print(f"Error deleting temp file: {e}")
+
+    worker_status = "idle"
+
+    return jsonify({
+        "status": status,
+        "output": output,
+        "errors": errors
+    })
+
+if __name__ == "__main__":
+    # Register the worker with the orchestrator
+    register_worker()
+
+    # Start a background thread to poll for tasks
+    threading.Thread(target=poll_for_tasks, daemon=True).start()
+
+    # Start the Flask server
+    app.run(host="0.0.0.0", port=5001)
