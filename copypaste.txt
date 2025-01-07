@@ -1,69 +1,29 @@
-from flask import Flask, request, jsonify
-import os
-import ast
-import re
-from pathlib import Path
+Amendment to the NFLPA Standard Representation Agreement (SRA)
 
-app = Flask(__name__)
+This Amendment (the “Amendment”) is entered into as of [Date], by and between [Player Name] (“Player”) and [Agent Name or Agency] (“Agent”), and modifies the NFLPA Standard Representation Agreement executed by the parties on [Original Agreement Date] (the “Agreement”).
 
+WHEREAS, the parties wish to amend the Agreement as provided below, while all other terms and conditions of the Agreement shall remain in full force and effect.
 
-def extract_requirements(file_content):
-    """
-    Analyze a Python file's imports and generate a list of requirements.
-    """
-    tree = ast.parse(file_content)
-    requirements = set()
+NOW, THEREFORE, in consideration of the mutual covenants and agreements contained herein, the parties agree as follows:
 
-    for node in tree.body:
-        # Handle standard imports (e.g., "import numpy")
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                requirements.add(alias.name.split(".")[0])
+	1.	Amendment to Section [Insert Section Number]:
+	•	Original Clause: “[Insert Original Wording]”
+	•	Amended Clause: “[Insert New Wording]”
+	2.	Additional Terms (if applicable):
+	•	[Specify any new terms being added to the SRA.]
+	3.	Effective Date:
+	•	This Amendment shall take effect on [Effective Date].
+	4.	No Other Changes:
+	•	Except as expressly amended herein, all other terms, conditions, and obligations of the Agreement shall remain unchanged and in full force and effect.
 
-        # Handle "from x import y" style imports
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                requirements.add(node.module.split(".")[0])
+IN WITNESS WHEREOF, the parties have executed this Amendment as of the date first above written.
 
-    return sorted(requirements)
+Player:
+[Player’s Full Name]
+[Signature]
+[Date]
 
-
-@app.route('/analyze', methods=['POST'])
-def analyze_python_file():
-    """
-    API endpoint to analyze a Python file and generate a requirements.txt.
-    """
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part in the request"}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    # Ensure the uploaded file is a Python file
-    if not file.filename.endswith('.py'):
-        return jsonify({"error": "Only .py files are allowed"}), 400
-
-    try:
-        # Read the file content
-        file_content = file.read().decode('utf-8')
-        
-        # Extract requirements
-        requirements = extract_requirements(file_content)
-
-        # Generate requirements.txt
-        requirements_file_path = Path("requirements.txt")
-        with open(requirements_file_path, "w") as f:
-            f.write("\n".join(requirements))
-
-        return jsonify({
-            "message": "requirements.txt generated successfully.",
-            "requirements": requirements
-        }), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+Agent/Agency:
+[Agent’s Full Name or Agency Name]
+[Signature]
+[Date]
