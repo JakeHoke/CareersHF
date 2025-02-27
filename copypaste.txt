@@ -1,47 +1,71 @@
-Original List: [4; 3; 1; 5; 2]
+(* Merge function: merges two sorted lists into one sorted list *)
+let rec merge sorted_list1 sorted_list2 = 
+  match sorted_list1, sorted_list2 with
+  | [], remaining -> 
+      Printf.printf "Merging: [] and [%s] → [%s]\n"
+        (String.concat "; " (List.map string_of_int remaining))
+        (String.concat "; " (List.map string_of_int remaining));
+      remaining
+  | remaining, [] -> 
+      Printf.printf "Merging: [%s] and [] → [%s]\n"
+        (String.concat "; " (List.map string_of_int remaining))
+        (String.concat "; " (List.map string_of_int remaining));
+      remaining
+  | first1 :: rest1, first2 :: rest2 -> 
+      if first1 < first2 then (
+        Printf.printf "Merging: %d < %d → %d added first\n" first1 first2 first1;
+        first1 :: merge rest1 (first2 :: rest2)
+      )
+      else (
+        Printf.printf "Merging: %d >= %d → %d added first\n" first1 first2 first2;
+        first2 :: merge (first1 :: rest1) rest2
+      )
 
-Sorting list: [4; 3; 1; 5; 2]
-Splitting: Moving 4 to Left, 3 to Right
-Splitting: Moving 1 to Left, 5 to Right
-Splitting: Adding last element 2 to Left
-Splitting done: Left = [4; 1; 2], Right = [3; 5]
+(* Function to split a list into two halves *)
+let rec split_list input_list left_half right_half = 
+  match input_list with
+  | [] -> 
+      Printf.printf "Splitting done: Left = [%s], Right = [%s]\n"
+        (String.concat "; " (List.map string_of_int left_half))
+        (String.concat "; " (List.map string_of_int right_half));
+      (left_half, right_half)
+  | [single_element] -> 
+      Printf.printf "Splitting: Adding last element %d to Left\n" single_element;
+      (single_element :: left_half, right_half)
+  | first :: second :: remaining -> 
+      Printf.printf "Splitting: Moving %d to Left, %d to Right\n" first second;
+      split_list remaining (first :: left_half) (second :: right_half)
 
-Sorting list: [4; 1; 2]
-Splitting: Moving 4 to Left, 1 to Right
-Splitting: Adding last element 2 to Left
-Splitting done: Left = [4], Right = [1; 2]
+(* Merge Sort function *)
+let rec merge_sort input_list = 
+  match input_list with
+  | [] -> 
+      Printf.printf "Base case: empty list → return []\n";
+      []
+  | [single_element] -> 
+      Printf.printf "Base case: single element [%d] → return [%d]\n" single_element single_element;
+      [single_element]
+  | _ -> 
+      Printf.printf "\nSorting list: [%s]\n"
+        (String.concat "; " (List.map string_of_int input_list));
 
-Base case: single element [4] → return [4]
-Sorting list: [1; 2]
-Splitting: Adding last element 1 to Left
-Splitting done: Left = [1], Right = [2]
+      let (left_half, right_half) = split_list input_list [] [] in
+      
+      let sorted_left = merge_sort left_half in
+      let sorted_right = merge_sort right_half in
 
-Base case: single element [1] → return [1]
-Base case: single element [2] → return [2]
-Merging sorted halves: [1] and [2]
-Merging: 1 < 2 → 1 added first
-Merging: [] and [2] → [2]
+      Printf.printf "Merging sorted halves: [%s] and [%s]\n"
+        (String.concat "; " (List.map string_of_int sorted_left))
+        (String.concat "; " (List.map string_of_int sorted_right));
 
-Merging sorted halves: [4] and [1; 2]
-Merging: 4 >= 1 → 1 added first
-Merging: 4 >= 2 → 2 added first
-Merging: [] and [4] → [4]
+      merge sorted_left sorted_right
 
-Sorting list: [3; 5]
-Splitting: Adding last element 3 to Left
-Splitting done: Left = [3], Right = [5]
+(* Test the merge_sort function *)
+let () =
+  let test_list = [4; 3; 1; 5; 2] in
+  Printf.printf "\nOriginal List: [%s]\n"
+    (String.concat "; " (List.map string_of_int test_list));
 
-Base case: single element [3] → return [3]
-Base case: single element [5] → return [5]
-Merging sorted halves: [3] and [5]
-Merging: 3 < 5 → 3 added first
-Merging: [] and [5] → [5]
-
-Merging sorted halves: [1; 2; 4] and [3; 5]
-Merging: 1 < 3 → 1 added first
-Merging: 2 < 3 → 2 added first
-Merging: 4 >= 3 → 3 added first
-Merging: 4 < 5 → 4 added first
-Merging: [] and [5] → [5]
-
-Sorted List: [1; 2; 3; 4; 5]
+  let sorted_list = merge_sort test_list in
+  Printf.printf "\nSorted List: [%s]\n"
+    (String.concat "; " (List.map string_of_int sorted_list))
