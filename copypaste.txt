@@ -1,29 +1,61 @@
-Amendment to the NFLPA Standard Representation Agreement (SRA)
+(* Merge function: merges two sorted lists into one sorted list *)
+let rec merge sorted_list1 sorted_list2 = 
+  match sorted_list1, sorted_list2 with
+  | [], remaining -> 
+      Printf.printf "Merging: [] and %s → %s\n"
+        (String.concat "; " (List.map string_of_int remaining))
+        (String.concat "; " (List.map string_of_int remaining));
+      remaining
+  | remaining, [] -> 
+      Printf.printf "Merging: %s and [] → %s\n"
+        (String.concat "; " (List.map string_of_int remaining))
+        (String.concat "; " (List.map string_of_int remaining));
+      remaining
+  | first1 :: rest1, first2 :: rest2 -> 
+      if first1 < first2 then (
+        Printf.printf "Merging: %d < %d → %d added first\n" first1 first2 first1;
+        first1 :: merge rest1 (first2 :: rest2)
+      )
+      else (
+        Printf.printf "Merging: %d >= %d → %d added first\n" first1 first2 first2;
+        first2 :: merge (first1 :: rest1) rest2
+      )
 
-This Amendment (the “Amendment”) is entered into as of [Date], by and between [Player Name] (“Player”) and [Agent Name or Agency] (“Agent”), and modifies the NFLPA Standard Representation Agreement executed by the parties on [Original Agreement Date] (the “Agreement”).
+(* Function to split a list into two halves *)
+let rec split_list input_list left_half right_half = 
+  match input_list with
+  | [] -> 
+      Printf.printf "Splitting: Left = [%s], Right = [%s]\n"
+        (String.concat "; " (List.map string_of_int left_half))
+        (String.concat "; " (List.map string_of_int right_half));
+      (left_half, right_half)
+  | [single_element] -> 
+      Printf.printf "Splitting: Adding last element %d to Left\n" single_element;
+      (single_element :: left_half, right_half)
+  | first :: second :: remaining -> 
+      Printf.printf "Splitting: Moving %d to Left, %d to Right\n" first second;
+      split_list remaining (first :: left_half) (second :: right_half)
 
-WHEREAS, the parties wish to amend the Agreement as provided below, while all other terms and conditions of the Agreement shall remain in full force and effect.
+(* Merge Sort function *)
+let rec merge_sort input_list = 
+  match input_list with
+  | [] -> 
+      Printf.printf "Base case: empty list → return []\n";
+      []
+  | [single_element] -> 
+      Printf.printf "Base case: single element [%d] → return [%d]\n" single_element single_element;
+      [single_element]
+  | _ -> 
+      Printf.printf "Sorting list: [%s]\n"
+        (String.concat "; " (List.map string_of_int input_list));
 
-NOW, THEREFORE, in consideration of the mutual covenants and agreements contained herein, the parties agree as follows:
+      let (left_half, right_half) = split_list input_list [] [] in
+      
+      let sorted_left = merge_sort left_half in
+      let sorted_right = merge_sort right_half in
 
-	1.	Amendment to Section [Insert Section Number]:
-	•	Original Clause: “[Insert Original Wording]”
-	•	Amended Clause: “[Insert New Wording]”
-	2.	Additional Terms (if applicable):
-	•	[Specify any new terms being added to the SRA.]
-	3.	Effective Date:
-	•	This Amendment shall take effect on [Effective Date].
-	4.	No Other Changes:
-	•	Except as expressly amended herein, all other terms, conditions, and obligations of the Agreement shall remain unchanged and in full force and effect.
+      Printf.printf "Merging sorted halves: [%s] and [%s]\n"
+        (String.concat "; " (List.map string_of_int sorted_left))
+        (String.concat "; " (List.map string_of_int sorted_right));
 
-IN WITNESS WHEREOF, the parties have executed this Amendment as of the date first above written.
-
-Player:
-[Player’s Full Name]
-[Signature]
-[Date]
-
-Agent/Agency:
-[Agent’s Full Name or Agency Name]
-[Signature]
-[Date]
+      merge sorted_left sorted_right
