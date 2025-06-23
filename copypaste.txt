@@ -1,0 +1,37 @@
+from flask import Blueprint, jsonify, request
+from auth import login, getCode
+import os
+from robin_stocks import robinhood as r
+from robinhood_utils import fetch_options_data
+
+robinhood_bp = Blueprint('robinhood', __name__)
+username = os.environ['USERNAME']
+password = os.environ['PASSWORD']
+
+@robinhood_bp.route('/quote/<symbol>', methods=['GET'])
+def equityQuote(symbol):
+    try:
+        r.login(username=username, password=password, mfa_code=getCode())
+        quote_data = r.stocks.get_fundamentals(symbol)
+        return jsonify(quote_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@robinhood_bp.route('/quote/options/<symbol>', methods=['GET'])
+def quoteOptions(symbol):
+    try:
+        r.login(username=username, password=password, mfa_code=getCode())
+        optionsData = r.options.find_tradable_options(symbol=symbol)
+        return jsonify(optionsData)
+    except Exception:
+        return jsonify({"error": "failed"}), 500
+
+@robinhood_bp.route('/options/<symbol>', methods=['GET'])
+def data(symbol):
+    try:
+        r.login(username=username, password=password, mfa_code=getCode())
+        optionsData = r.options.find_tradable_options(symbol=symbol)
+        expDates = sorted({option["expiration_date"] for option in optionsData})
+        return jsonify(expDates)
+    except Exception:
+        return jsonify({"error": "failed"}), 500
