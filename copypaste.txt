@@ -1,25 +1,47 @@
-from flask import Flask, jsonify, request
-import requests
-import os
+from flask import Flask, jsonify
+import yfinance as yf
 
 app = Flask(__name__)
-API_KEY = os.environ["POLYGON_API_KEY"]
 
-@app.route("/quote/<symbol>")
-def quote(symbol):
+@app.route('/quote/<symbol>', methods=['GET'])
+def get_stock_quote(symbol):
     try:
-        url = f"https://api.polygon.io/v2/last/trade/{symbol.upper()}?apiKey={API_KEY}"
-        response = requests.get(url)
-        return jsonify(response.json())
+        ticker = yf.Ticker(symbol)
+        quote = ticker.info
+
+        data = {
+            "symbol": symbol.upper(),
+            "price": quote.get("regularMarketPrice"),
+            "previous_close": quote.get("previousClose"),
+            "open": quote.get("open"),
+            "high": quote.get("dayHigh"),
+            "low": quote.get("dayLow"),
+            "volume": quote.get("volume"),
+            "market_cap": quote.get("marketCap"),
+        }
+
+        return jsonify(data)
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/options/<symbol>")
-def options(symbol):
+@app.route('/options/<symbol>', methods=['GET'])
+def get_options(symbol):
     try:
-        url = f"https://api.polygon.io/v3/snapshot/options/{symbol.upper()}?apiKey={API_KEY}"
-        response = requests.get(url)
-        return jsonify(response.json())
+        ticker = yf.Ticker(symbol)
+        expirations = ticker.options
+        options_chain = {}
+
+        for exp in expirations:
+            calls = ticker.option_chain(exp).calls.to_dict("records")
+            puts = ticker.option_chain(exp).puts.to_dict("records")
+            options_chain[exp] = {"calls": calls, "puts": puts}
+
+        return jsonify({
+            "symbol": symbol.upper(),
+            "options": options_chain
+        })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
