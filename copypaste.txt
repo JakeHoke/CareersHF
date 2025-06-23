@@ -1,48 +1,27 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from shortcuts_utils import read_csv, write_csv
+from flask import Flask, jsonify, request
+import requests
+import os
 
-shortcut_bp = Blueprint('shortcut', __name__)
+app = Flask(__name__)
+API_KEY = os.environ["POLYGON_API_KEY"]
 
-@shortcut_bp.route('/shortcuts')
-def shortcuts():
-    equities, commodities = read_csv()
-    return render_template("shortcuts.html", equities=equities, commodities=commodities)
+@app.route("/quote/<symbol>")
+def quote(symbol):
+    try:
+        url = f"https://api.polygon.io/v2/last/trade/{symbol.upper()}?apiKey={API_KEY}"
+        response = requests.get(url)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@shortcut_bp.route('/add', methods=['POST'])
-def add():
-    equities, commodities = read_csv()
-    data = equities + commodities
-    valid_ids = [int(row["id"]) for row in data if row["id"] is not None]
-    new_id = max(valid_ids) + 1 if valid_ids else 1
-    new_item = {
-        "id": new_id,
-        "title": request.form['title'],
-        "symbol": request.form['symbol']
-    }
-    (commodities if '=' in new_item["symbol"] else equities).append(new_item)
-    write_csv(equities + commodities)
-    return redirect(url_for('shortcut.shortcuts'))
+@app.route("/options/<symbol>")
+def options(symbol):
+    try:
+        url = f"https://api.polygon.io/v3/snapshot/options/{symbol.upper()}?apiKey={API_KEY}"
+        response = requests.get(url)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@shortcut_bp.route('/edit/<int:row_id>', methods=['POST'])
-def edit(row_id):
-    equities, commodities = read_csv()
-    data = equities + commodities
-    for row in data:
-        if int(row['id']) == row_id:
-            row['title'] = request.form['title']
-            row['symbol'] = request.form['symbol']
-    write_csv(data)
-    return redirect(url_for('shortcut.shortcuts'))
-
-@shortcut_bp.route('/delete/<int:row_id>', methods=['POST'])
-def delete(row_id):
-    equities, commodities = read_csv()
-    data = equities + commodities
-    data = [row for row in data if int(row['id']) != row_id]
-    write_csv(data)
-    return redirect(url_for('shortcut.shortcuts'))
-
-@shortcut_bp.route('/')
-def index():
-    equities, commodities = read_csv()
-    return render_template("index.html", equities=equities, commodities=commodities)
+if __name__ == "__main__":
+    app.run(debug=True)
