@@ -1,21 +1,19 @@
 =LET(
   text, C2,
   terms, {"PO BOX", "APT", "UNIT", "SUITE", "STE", "FL"},
-  
+
   getValueAfter, LAMBDA(term,
     IFERROR(
-      term & " " & 
-      TRIM(
-        MID(
-          text,
-          FIND(term & " ", text) + LEN(term) + 1,
-          FIND(" ", text & " ", FIND(term & " ", text) + LEN(term) + 1) - (FIND(term & " ", text) + LEN(term) + 1)
-        )
+      LET(
+        pos, FIND(term & " ", text),
+        nextStart, pos + LEN(term) + 1,
+        nextWord, TRIM(MID(text, nextStart, FIND(" ", text & " ", nextStart) - nextStart)),
+        IF(ISNUMBER(pos), term & " " & nextWord, "")
       ),
       ""
     )
   ),
-  
+
   result,
     IF(getValueAfter(INDEX(terms,1))<>"", getValueAfter(INDEX(terms,1)),
     IF(getValueAfter(INDEX(terms,2))<>"", getValueAfter(INDEX(terms,2)),
@@ -24,6 +22,6 @@
     IF(getValueAfter(INDEX(terms,5))<>"", getValueAfter(INDEX(terms,5)),
     IF(getValueAfter(INDEX(terms,6))<>"", getValueAfter(INDEX(terms,6)),
     "")))))),
-  
+
   result
 )
