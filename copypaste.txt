@@ -1,19 +1,16 @@
 =LET(
   text, C2,
+  apt, E2,
   suffixes, {" ST ", " RD ", " AVE ", " BLVD ", " LN ", " DR ", " CT ", " PKWY ", " WAY ", " PL "},
-  units, {"APT", "UNIT", "SUITE", "STE"},
-  
+
   lastSuffixPos,
-    MAX(IFERROR(FIND(suffix, UPPER(text) & " "), 0) + LEN(suffix) - 1, 0)),
-  
-  lastUnitPos,
-    MAX(IFERROR(FIND(unit & " ", UPPER(text) & " "), 0) + LEN(unit), 0)),
-  
-  aptPresent,
-    IF(lastUnitPos > lastSuffixPos, TRUE, FALSE),
+    MAX(IFERROR(FIND(suffix, UPPER(text) & " "), 0) + LEN(suffix) - 1),
 
   cityStartPos,
-    IF(aptPresent, lastUnitPos + 1, lastSuffixPos + 2),
+    IF(apt <> "",
+      FIND(apt, text) + LEN(apt) + 1,
+      lastSuffixPos + 2
+    ),
 
   city,
     TRIM(MID(text, cityStartPos, LEN(text))),
