@@ -1,6 +1,7 @@
 =LET(
   text, C2,
   apt, E2,
+  state, G2,
   suffixes, {" ST ", " RD ", " AVE ", " BLVD ", " LN ", " DR ", " CT ", " PKWY ", " WAY ", " PL "},
 
   lastSuffixPos,
@@ -12,8 +13,9 @@
       lastSuffixPos + 2
     ),
 
-  city,
-    TRIM(MID(text, cityStartPos, LEN(text))),
+  statePos, FIND(state, text),
+
+  city, TRIM(MID(text, cityStartPos, statePos - cityStartPos)),
 
   city
 )
