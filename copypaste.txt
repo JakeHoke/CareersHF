@@ -1,27 +1,22 @@
 =LET(
   text, C2,
-  terms, {"PO BOX", "APT", "UNIT", "SUITE", "STE", "FL"},
+  suffixes, {" ST ", " RD ", " AVE ", " BLVD ", " LN ", " DR ", " CT ", " PKWY ", " WAY ", " PL "},
+  units, {"APT", "UNIT", "SUITE", "STE"},
+  
+  lastSuffixPos,
+    MAX(IFERROR(FIND(suffix, UPPER(text) & " "), 0) + LEN(suffix) - 1, 0)),
+  
+  lastUnitPos,
+    MAX(IFERROR(FIND(unit & " ", UPPER(text) & " "), 0) + LEN(unit), 0)),
+  
+  aptPresent,
+    IF(lastUnitPos > lastSuffixPos, TRUE, FALSE),
 
-  getValueAfter, LAMBDA(term,
-    IFERROR(
-      LET(
-        pos, FIND(term & " ", text),
-        nextStart, pos + LEN(term) + 1,
-        nextWord, TRIM(MID(text, nextStart, FIND(" ", text & " ", nextStart) - nextStart)),
-        IF(ISNUMBER(pos), term & " " & nextWord, "")
-      ),
-      ""
-    )
-  ),
+  cityStartPos,
+    IF(aptPresent, lastUnitPos + 1, lastSuffixPos + 2),
 
-  result,
-    IF(getValueAfter(INDEX(terms,1))<>"", getValueAfter(INDEX(terms,1)),
-    IF(getValueAfter(INDEX(terms,2))<>"", getValueAfter(INDEX(terms,2)),
-    IF(getValueAfter(INDEX(terms,3))<>"", getValueAfter(INDEX(terms,3)),
-    IF(getValueAfter(INDEX(terms,4))<>"", getValueAfter(INDEX(terms,4)),
-    IF(getValueAfter(INDEX(terms,5))<>"", getValueAfter(INDEX(terms,5)),
-    IF(getValueAfter(INDEX(terms,6))<>"", getValueAfter(INDEX(terms,6)),
-    "")))))),
+  city,
+    TRIM(MID(text, cityStartPos, LEN(text))),
 
-  result
+  city
 )
