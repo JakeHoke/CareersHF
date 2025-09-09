@@ -1,9 +1,7 @@
-=IFERROR(
-  TRIM(MID(C2, FIND("APT", C2) + 4, FIND(" ", C2 & " ", FIND("APT", C2) + 4) - (FIND("APT", C2) + 4))),
-  IFERROR(
-    TRIM(MID(C2, FIND("UNIT", C2) + 5, FIND(" ", C2 & " ", FIND("UNIT", C2) + 5) - (FIND("UNIT", C2) + 5))),
-    IFERROR(
-      TRIM(MID(C2, FIND("SUITE", C2) + 6, FIND(" ", C2 & " ", FIND("SUITE", C2) + 6) - (FIND("SUITE", C2) + 6))),
-    "")
-  )
+=LET(
+  terms, G1:G10,
+  found, FILTER(terms, ISNUMBER(SEARCH(terms, C2))),
+  label, INDEX(found, 1),
+  value, TRIM(MID(C2, FIND(label, C2) + LEN(label) + 1, FIND(" ", C2 & " ", FIND(label, C2) + LEN(label) + 1) - (FIND(label, C2) + LEN(label) + 1))),
+  IFERROR(label & " " & value, "")
 )
