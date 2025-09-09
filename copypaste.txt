@@ -1,21 +1,7 @@
 =LET(
-  text, C2,
-  apt, E2,
-  suffixes, {" ST ", " RD ", " AVE ", " BLVD ", " LN ", " DR ", " CT ", " PKWY ", " WAY ", " PL "},
-
-  findSuffix, LAMBDA(sfx, IFERROR(FIND(sfx, " " & UPPER(text) & " "), 0) + LEN(sfx) - 1),
-
-  suffixPositions, MAP(suffixes, findSuffix),
-  lastSuffixPos, MAX(suffixPositions),
-
-  cityStartPos,
-    IF(apt <> "",
-      IFERROR(FIND(apt, text) + LEN(apt) + 1, 0),
-      lastSuffixPos + 2
-    ),
-
-  city,
-    IF(cityStartPos > 0, TRIM(MID(text, cityStartPos, LEN(text))), ""),
-
-  city
+  full, C2,
+  town, G2,
+  pos, FIND(town, full),
+  result, TRIM(LEFT(full, pos - 1)),
+  result
 )
