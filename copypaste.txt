@@ -9,13 +9,13 @@
 
   cityStartPos,
     IF(apt <> "",
-      FIND(apt, text) + LEN(apt) + 1,
+      IFERROR(FIND(apt, text) + LEN(apt) + 1, 0),
       lastSuffixPos + 2
     ),
 
-  statePos, FIND(state, text),
+  statePos, IFERROR(FIND(state, text), LEN(text) + 1),
 
-  city, TRIM(MID(text, cityStartPos, statePos - cityStartPos)),
+  city, IF(cityStartPos > 0, TRIM(MID(text, cityStartPos, statePos - cityStartPos)), ""),
 
   city
 )
