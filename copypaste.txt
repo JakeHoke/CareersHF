@@ -1,102 +1,11 @@
-1. Motion for Default Judgment
+Local Rules: Every court has unique rules governing pleadings, motions, formatting, deadlines, and service. These templates must be carefully reviewed and adapted by a licensed attorney admitted to practice in the jurisdiction where the case will be filed.
+	•	Facts & Evidence: The effectiveness of these documents depends entirely on the underlying facts and evidence, which must be verified and properly presented by counsel. Supporting exhibits (e.g., text messages, receipts, proof of payment) must be attached where required.
+	•	Legal Theories: Causes of action and motions described herein (breach of contract, unjust enrichment, conversion, default judgment, discovery motions, summary judgment, motions in limine, protective orders, sanctions, etc.) are general categories. Whether they are available or advisable in this case depends on state law, the judge, and the litigation strategy chosen by counsel.
+	•	Risks: Improperly drafted or filed documents may result in dismissal of the case, loss of rights, sanctions, or adverse judgments.
+	•	Next Steps:
+	•	Consult with a licensed attorney before filing anything with the court.
+	•	Provide your attorney with these drafts, the supporting evidence (texts, payment proof, correspondence), and a written timeline of events.
+	•	Follow your attorney’s guidance as to which motions to file, in what order, and at what stage of the proceedings.
 
-Filed if the contractor does not respond to the Complaint within the required time.
-
-MOTION FOR DEFAULT JUDGMENT
-
-Plaintiff, by and through counsel, respectfully moves this Court for entry of default judgment against Defendant pursuant to [Rule 55 / state equivalent].
-	1.	Plaintiff filed the Complaint on [date], alleging breach of contract and unjust enrichment.
-	2.	Defendant was properly served on [date].
-	3.	Defendant has failed to plead, answer, or otherwise defend within the time allowed.
-	4.	Plaintiff therefore requests judgment in the amount of $10,000, plus costs, interest, and such other relief as the Court deems just.
-
-Respectfully submitted,
-[Attorney’s signature block]
-
-⸻
-
-2. Motion to Compel Discovery
-
-Filed if Defendant refuses to produce documents like receipts or communications.
-
-MOTION TO COMPEL DISCOVERY
-
-Plaintiff moves this Court pursuant to [Rule/state rule] to compel Defendant to provide complete responses to Plaintiff’s discovery requests.
-	1.	On [date], Plaintiff served Defendant with interrogatories and requests for production regarding materials purchased and expenditures made with Plaintiff’s $10,000.
-	2.	Defendant has failed to provide adequate responses.
-	3.	Plaintiff has conferred in good faith to resolve the issue without court intervention, without success.
-	4.	Plaintiff requests an order compelling Defendant to respond within 14 days and awarding costs and fees incurred in making this motion.
-
-Respectfully submitted,
-[Attorney’s signature block]
-
-⸻
-
-3. Motion for Summary Judgment
-
-Filed after discovery, if the facts are undisputed.
-
-MOTION FOR SUMMARY JUDGMENT
-
-Plaintiff, by counsel, moves this Court pursuant to [Rule 56 / state equivalent] for summary judgment.
-	1.	The undisputed facts show:
-	•	Plaintiff paid Defendant $10,000 on [date].
-	•	Defendant agreed, via text messages, to perform septic work at Plaintiff’s property.
-	•	Defendant failed to perform any substantial work and has not refunded the funds.
-	2.	No genuine issue of material fact exists.
-	3.	Plaintiff is entitled to judgment as a matter of law on her breach of contract and unjust enrichment claims.
-
-Plaintiff requests entry of judgment in the amount of $10,000 plus interest and costs.
-
-Respectfully submitted,
-[Attorney’s signature block]
-
-⸻
-
-4. Motion in Limine
-
-Filed before trial, to exclude irrelevant or prejudicial evidence.
-
-MOTION IN LIMINE
-
-Plaintiff moves this Court to exclude certain evidence at trial.
-	1.	Defendant may attempt to introduce evidence unrelated to the contract, including personal financial hardship, unrelated jobs, or collateral issues.
-	2.	Such evidence is irrelevant under [Rule of Evidence 401] and unfairly prejudicial under [Rule 403].
-	3.	Allowing such evidence would confuse the issues and mislead the jury.
-
-WHEREFORE, Plaintiff requests an order barring Defendant from presenting such evidence at trial.
-
-Respectfully submitted,
-[Attorney’s signature block]
-
-⸻
-
-5. Motion for Protective Order (Optional)
-
-Filed if Defendant abuses discovery or requests irrelevant/harassing materials.
-
-MOTION FOR PROTECTIVE ORDER
-
-Plaintiff moves for a protective order under [Rule/state rule] to prevent Defendant from seeking discovery that is irrelevant, unduly burdensome, or intended to harass.
-	1.	Defendant served requests for [describe unreasonable requests].
-	2.	The requests have no relevance to the claims or defenses and impose undue burden on Plaintiff.
-	3.	Plaintiff seeks a protective order limiting discovery to relevant matters.
-
-Respectfully submitted,
-[Attorney’s signature block]
-
-⸻
-
-6. Motion for Sanctions (Optional)
-
-Filed if Defendant acts in bad faith — e.g., hides evidence, refuses to appear, lies under oath.
-
-MOTION FOR SANCTIONS
-
-Plaintiff moves this Court for sanctions against Defendant pursuant to [Rule/state rule].
-	1.	Defendant has [describe misconduct, e.g., failed to appear for deposition, destroyed evidence].
-	2.	Such conduct has prejudiced Plaintiff’s ability to prosecute her case.
-	3.	Plaintiff requests sanctions including attorney’s fees, adverse inference, and/or striking Defendant’s pleadings.
-
-Respectfully submitted,
-[Attorney’s signature block]
+Bottom Line:
+These documents are starting points only. They are intended to help you organize the facts and legal theories so that your attorney can efficiently prepare a proper filing tailored to your jurisdiction.
