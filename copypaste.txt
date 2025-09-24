@@ -1,6 +1,64 @@
-Why audits are conducted
-	•	Life changes: Marriage, divorce, business changes, or new family members can shift insurance needs.
-	•	Policy performance: Cash value policies fluctuate with interest rates and markets; audits verify they’re on track.
-	•	Cost optimization: Can identify ways to reduce premiums or qualify for better rates.
-	•	Mitigate fiduciary liability: Helps trustees manage policies in trusts and uncover hidden issues.
-	•	Business planning: Ensures policies for buy-sell agreements or key-person coverage remain suitable.
+Complaint
+
+[Client’s Name],
+Plaintiff,
+v.
+[Contractor’s Name/Company],
+Defendant.
+
+Case No.: [To be assigned]
+
+⸻
+
+COMPLAINT
+
+Parties
+	1.	Plaintiff, [Client’s Full Name], resides at [address].
+	2.	Defendant, [Contractor’s Full Name/Business], is believed to be a contractor doing business in [county/state], with an address at [address].
+
+Jurisdiction and Venue
+3. Jurisdiction is proper because the agreement was entered into and to be performed in this county.
+4. Venue is proper because Defendant resides and/or conducts business in this county.
+
+Facts
+5. On or about [date], Plaintiff and Defendant entered into an agreement, memorialized in text messages, under which Defendant was to perform septic system work at Plaintiff’s property located at [address].
+6. Defendant agreed to perform septic work in exchange for $10,000.
+7. Plaintiff paid Defendant $10,000 on [date] as an upfront deposit.
+8. Defendant has failed and refused to commence the agreed septic work.
+9. Defendant purchased only minimal or insignificant materials that do not justify or account for the $10,000 deposit.
+10. Despite demands, Defendant has not refunded Plaintiff’s money or performed the work.
+11. Plaintiff has been damaged in the amount of $10,000 plus interest.
+
+⸻
+
+Count I — Breach of Contract
+12. Plaintiff incorporates paragraphs 1–11.
+13. A valid contract existed between Plaintiff and Defendant, formed by offer, acceptance, and consideration.
+14. Plaintiff performed her obligations by paying $10,000.
+15. Defendant materially breached the agreement by failing to perform septic work.
+16. Plaintiff suffered damages of $10,000 plus interest.
+
+⸻
+
+Count II — Unjust Enrichment (Pled in the Alternative)
+17. Defendant has received and retained $10,000 from Plaintiff without providing the promised services.
+18. It would be unjust to allow Defendant to retain this benefit without restitution.
+
+⸻
+
+Count III — Conversion (Optional, if facts support it)
+19. Plaintiff paid $10,000 for septic work.
+20. Defendant wrongfully retained and exercised control over these funds for personal use.
+21. Defendant’s conduct constitutes conversion of Plaintiff’s property.
+
+⸻
+
+Prayer for Relief
+WHEREFORE, Plaintiff demands judgment against Defendant for:
+
+a. Compensatory damages of $10,000 plus interest;
+b. Restitution of funds unjustly retained;
+c. Costs of this action; and
+d. Such further relief as the Court deems just and proper.
+
+[Signature block for Plaintiff or Attorney]
