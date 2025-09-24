@@ -1,57 +1,102 @@
-Civil Case Roadmap – Breach of Contract (Contractor Dispute)
+1. Motion for Default Judgment
 
-⚖️ Important: An attorney must handle filing and court appearances. This is just an outline of what typically happens.
+Filed if the contractor does not respond to the Complaint within the required time.
 
-⸻
+MOTION FOR DEFAULT JUDGMENT
 
-Step 1. File the Complaint
-	•	Attorney files Complaint (lawsuit) with the court and serves the contractor with the Summons.
-	•	This officially starts the case.
+Plaintiff, by and through counsel, respectfully moves this Court for entry of default judgment against Defendant pursuant to [Rule 55 / state equivalent].
+	1.	Plaintiff filed the Complaint on [date], alleging breach of contract and unjust enrichment.
+	2.	Defendant was properly served on [date].
+	3.	Defendant has failed to plead, answer, or otherwise defend within the time allowed.
+	4.	Plaintiff therefore requests judgment in the amount of $10,000, plus costs, interest, and such other relief as the Court deems just.
 
-⸻
-
-Step 2. Wait for Defendant’s Response
-	•	The contractor has 20–30 days (depends on state) to respond.
-
-If they do nothing:
-➡️ Attorney files a Motion for Default Judgment (ask court to award you the money immediately).
-
-If they file an Answer (deny allegations):
-➡️ Case moves to discovery (both sides exchange documents).
-
-If they file a Motion to Dismiss:
-➡️ Attorney responds with legal arguments to keep the case alive.
+Respectfully submitted,
+[Attorney’s signature block]
 
 ⸻
 
-Step 3. Discovery Stage
-	•	Both sides must share evidence (texts, receipts, proof of payment).
-	•	If contractor refuses to cooperate:
-➡️ Attorney files a Motion to Compel Discovery to force them to hand over evidence.
+2. Motion to Compel Discovery
+
+Filed if Defendant refuses to produce documents like receipts or communications.
+
+MOTION TO COMPEL DISCOVERY
+
+Plaintiff moves this Court pursuant to [Rule/state rule] to compel Defendant to provide complete responses to Plaintiff’s discovery requests.
+	1.	On [date], Plaintiff served Defendant with interrogatories and requests for production regarding materials purchased and expenditures made with Plaintiff’s $10,000.
+	2.	Defendant has failed to provide adequate responses.
+	3.	Plaintiff has conferred in good faith to resolve the issue without court intervention, without success.
+	4.	Plaintiff requests an order compelling Defendant to respond within 14 days and awarding costs and fees incurred in making this motion.
+
+Respectfully submitted,
+[Attorney’s signature block]
 
 ⸻
 
-Step 4. Pre-Trial Motions
-	•	After discovery, attorney reviews facts.
+3. Motion for Summary Judgment
 
-If evidence is clear (you paid $10k, no work done):
-➡️ Attorney files a Motion for Summary Judgment (ask judge to rule now without trial).
+Filed after discovery, if the facts are undisputed.
 
-If case goes to trial:
-➡️ Attorney files Motions in Limine to block irrelevant or prejudicial evidence.
+MOTION FOR SUMMARY JUDGMENT
+
+Plaintiff, by counsel, moves this Court pursuant to [Rule 56 / state equivalent] for summary judgment.
+	1.	The undisputed facts show:
+	•	Plaintiff paid Defendant $10,000 on [date].
+	•	Defendant agreed, via text messages, to perform septic work at Plaintiff’s property.
+	•	Defendant failed to perform any substantial work and has not refunded the funds.
+	2.	No genuine issue of material fact exists.
+	3.	Plaintiff is entitled to judgment as a matter of law on her breach of contract and unjust enrichment claims.
+
+Plaintiff requests entry of judgment in the amount of $10,000 plus interest and costs.
+
+Respectfully submitted,
+[Attorney’s signature block]
 
 ⸻
 
-Step 5. Trial (if necessary)
-	•	If summary judgment is denied, the case is decided at trial.
-	•	Attorney presents your texts, payment proof, and testimony.
+4. Motion in Limine
+
+Filed before trial, to exclude irrelevant or prejudicial evidence.
+
+MOTION IN LIMINE
+
+Plaintiff moves this Court to exclude certain evidence at trial.
+	1.	Defendant may attempt to introduce evidence unrelated to the contract, including personal financial hardship, unrelated jobs, or collateral issues.
+	2.	Such evidence is irrelevant under [Rule of Evidence 401] and unfairly prejudicial under [Rule 403].
+	3.	Allowing such evidence would confuse the issues and mislead the jury.
+
+WHEREFORE, Plaintiff requests an order barring Defendant from presenting such evidence at trial.
+
+Respectfully submitted,
+[Attorney’s signature block]
 
 ⸻
 
-Summary Flow
-	1.	Complaint filed → Defendant has deadline to respond.
-	2.	No response → Default Judgment.
-	3.	Response → Discovery.
-	4.	If stonewalling → Motion to Compel.
-	5.	If facts are clear → Motion for Summary Judgment.
-	6.	If trial happens → Motions in Limine.
+5. Motion for Protective Order (Optional)
+
+Filed if Defendant abuses discovery or requests irrelevant/harassing materials.
+
+MOTION FOR PROTECTIVE ORDER
+
+Plaintiff moves for a protective order under [Rule/state rule] to prevent Defendant from seeking discovery that is irrelevant, unduly burdensome, or intended to harass.
+	1.	Defendant served requests for [describe unreasonable requests].
+	2.	The requests have no relevance to the claims or defenses and impose undue burden on Plaintiff.
+	3.	Plaintiff seeks a protective order limiting discovery to relevant matters.
+
+Respectfully submitted,
+[Attorney’s signature block]
+
+⸻
+
+6. Motion for Sanctions (Optional)
+
+Filed if Defendant acts in bad faith — e.g., hides evidence, refuses to appear, lies under oath.
+
+MOTION FOR SANCTIONS
+
+Plaintiff moves this Court for sanctions against Defendant pursuant to [Rule/state rule].
+	1.	Defendant has [describe misconduct, e.g., failed to appear for deposition, destroyed evidence].
+	2.	Such conduct has prejudiced Plaintiff’s ability to prosecute her case.
+	3.	Plaintiff requests sanctions including attorney’s fees, adverse inference, and/or striking Defendant’s pleadings.
+
+Respectfully submitted,
+[Attorney’s signature block]
