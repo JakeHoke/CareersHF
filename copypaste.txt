@@ -1,64 +1,57 @@
-Complaint
+Civil Case Roadmap – Breach of Contract (Contractor Dispute)
 
-[Client’s Name],
-Plaintiff,
-v.
-[Contractor’s Name/Company],
-Defendant.
-
-Case No.: [To be assigned]
+⚖️ Important: An attorney must handle filing and court appearances. This is just an outline of what typically happens.
 
 ⸻
 
-COMPLAINT
-
-Parties
-	1.	Plaintiff, [Client’s Full Name], resides at [address].
-	2.	Defendant, [Contractor’s Full Name/Business], is believed to be a contractor doing business in [county/state], with an address at [address].
-
-Jurisdiction and Venue
-3. Jurisdiction is proper because the agreement was entered into and to be performed in this county.
-4. Venue is proper because Defendant resides and/or conducts business in this county.
-
-Facts
-5. On or about [date], Plaintiff and Defendant entered into an agreement, memorialized in text messages, under which Defendant was to perform septic system work at Plaintiff’s property located at [address].
-6. Defendant agreed to perform septic work in exchange for $10,000.
-7. Plaintiff paid Defendant $10,000 on [date] as an upfront deposit.
-8. Defendant has failed and refused to commence the agreed septic work.
-9. Defendant purchased only minimal or insignificant materials that do not justify or account for the $10,000 deposit.
-10. Despite demands, Defendant has not refunded Plaintiff’s money or performed the work.
-11. Plaintiff has been damaged in the amount of $10,000 plus interest.
+Step 1. File the Complaint
+	•	Attorney files Complaint (lawsuit) with the court and serves the contractor with the Summons.
+	•	This officially starts the case.
 
 ⸻
 
-Count I — Breach of Contract
-12. Plaintiff incorporates paragraphs 1–11.
-13. A valid contract existed between Plaintiff and Defendant, formed by offer, acceptance, and consideration.
-14. Plaintiff performed her obligations by paying $10,000.
-15. Defendant materially breached the agreement by failing to perform septic work.
-16. Plaintiff suffered damages of $10,000 plus interest.
+Step 2. Wait for Defendant’s Response
+	•	The contractor has 20–30 days (depends on state) to respond.
+
+If they do nothing:
+➡️ Attorney files a Motion for Default Judgment (ask court to award you the money immediately).
+
+If they file an Answer (deny allegations):
+➡️ Case moves to discovery (both sides exchange documents).
+
+If they file a Motion to Dismiss:
+➡️ Attorney responds with legal arguments to keep the case alive.
 
 ⸻
 
-Count II — Unjust Enrichment (Pled in the Alternative)
-17. Defendant has received and retained $10,000 from Plaintiff without providing the promised services.
-18. It would be unjust to allow Defendant to retain this benefit without restitution.
+Step 3. Discovery Stage
+	•	Both sides must share evidence (texts, receipts, proof of payment).
+	•	If contractor refuses to cooperate:
+➡️ Attorney files a Motion to Compel Discovery to force them to hand over evidence.
 
 ⸻
 
-Count III — Conversion (Optional, if facts support it)
-19. Plaintiff paid $10,000 for septic work.
-20. Defendant wrongfully retained and exercised control over these funds for personal use.
-21. Defendant’s conduct constitutes conversion of Plaintiff’s property.
+Step 4. Pre-Trial Motions
+	•	After discovery, attorney reviews facts.
+
+If evidence is clear (you paid $10k, no work done):
+➡️ Attorney files a Motion for Summary Judgment (ask judge to rule now without trial).
+
+If case goes to trial:
+➡️ Attorney files Motions in Limine to block irrelevant or prejudicial evidence.
 
 ⸻
 
-Prayer for Relief
-WHEREFORE, Plaintiff demands judgment against Defendant for:
+Step 5. Trial (if necessary)
+	•	If summary judgment is denied, the case is decided at trial.
+	•	Attorney presents your texts, payment proof, and testimony.
 
-a. Compensatory damages of $10,000 plus interest;
-b. Restitution of funds unjustly retained;
-c. Costs of this action; and
-d. Such further relief as the Court deems just and proper.
+⸻
 
-[Signature block for Plaintiff or Attorney]
+Summary Flow
+	1.	Complaint filed → Defendant has deadline to respond.
+	2.	No response → Default Judgment.
+	3.	Response → Discovery.
+	4.	If stonewalling → Motion to Compel.
+	5.	If facts are clear → Motion for Summary Judgment.
+	6.	If trial happens → Motions in Limine.
