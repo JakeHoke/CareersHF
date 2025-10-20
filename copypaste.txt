@@ -1,1 +1,264 @@
-https://1drv.ms/i/c/4c3830b95aa10893/EVMksH6ZL0VKvXWF0tIlmXoBN9x13-qLpt35v5getZkSbQ
+import math
+from dataclasses import dataclass
+from typing import Literal, Optional, Dict
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+import pandas_market_calendars as mcal
+import pytz
+
+Method = Literal["iid_normal", "intra_bootstrap"]
+
+ET = pytz.timezone("America/New_York")
+
+@dataclass
+class IntradayResult:
+    ticker: str
+    as_of_ts: pd.Timestamp
+    target_ts: pd.Timestamp
+    remaining_minutes: int
+    last_price: float
+    threshold_price: float
+    prob_above: float
+    method: Method
+    details: Dict
+
+# ---------- Market calendar helpers ----------
+
+def nyse_session_bounds(day: pd.Timestamp) -> tuple[pd.Timestamp, pd.Timestamp]:
+    day = pd.Timestamp(day.date()).tz_localize(ET)
+    nyse = mcal.get_calendar("XNYS")
+    sched = nyse.schedule(start_date=day.date(), end_date=day.date())
+    if sched.empty:
+        raise ValueError("No NYSE session on this date.")
+    open_ts = sched["market_open"].iloc[0].tz_convert(ET)
+    close_ts = sched["market_close"].iloc[0].tz_convert(ET)
+    return open_ts, close_ts
+
+def nyse_minutes_between(start_ts: pd.Timestamp, end_ts: pd.Timestamp) -> pd.DatetimeIndex:
+    nyse = mcal.get_calendar("XNYS")
+    sched = nyse.schedule(start_date=start_ts.date(), end_date=end_ts.date())
+    minutes = mcal.date_range(sched, frequency="1min").tz_convert(ET)
+    return minutes[(minutes >= start_ts) & (minutes <= end_ts)]
+
+# ---------- Data ----------
+
+def fetch_intraday_1m(ticker: str, days: int = 7) -> pd.DataFrame:
+    """
+    Pull ~last `days` of 1-minute data. yfinance caps how far back 1m goes (~7d).
+    """
+    df = yf.download(ticker, period=f"{min(days,7)}d", interval="1m", auto_adjust=True, prepost=False, progress=False)
+    if df.empty:
+        raise ValueError(f"No intraday data for {ticker}.")
+    df.index = pd.to_datetime(df.index).tz_convert(ET)
+    # keep regular session minutes only
+    df = df[df.index.map(lambda ts: is_regular_minute(ts))]
+    return df[["Open", "High", "Low", "Close", "Volume"]]
+
+def is_regular_minute(ts: pd.Timestamp) -> bool:
+    try:
+        o,c = nyse_session_bounds(ts)
+        return (ts >= o) and (ts <= c)
+    except Exception:
+        return False
+
+def minute_log_returns(close: pd.Series) -> pd.Series:
+    r = np.log(close).diff().dropna()
+    # Filter obvious bad ticks (optional)
+    cutoff = 0.05  # 5% in a minute = likely bad for most tickers
+    return r[np.abs(r) < cutoff]
+
+# ---------- Engine A: Analytic iid normal (closed-form) ----------
+
+def prob_above_iid_normal(
+    df_1m: pd.DataFrame,
+    threshold_price: float,
+    target_ts: pd.Timestamp,
+    as_of: Optional[pd.Timestamp] = None,
+    lookback_minutes: int = 240,  # ~ last 4 hours
+    floor_sigma_per_min: float = 1e-6
+) -> IntradayResult:
+    if as_of is None:
+        as_of = df_1m.index[-1]
+    as_of = pd.to_datetime(as_of).tz_convert(ET)
+    target_ts = pd.to_datetime(target_ts).tz_convert(ET)
+
+    # Validate target within same session and in the future
+    o, c = nyse_session_bounds(as_of)
+    if not (o <= target_ts <= c):
+        raise ValueError("target_ts must be within the same trading session (regular hours).")
+    if target_ts <= as_of:
+        raise ValueError("target_ts must be in the future.")
+
+    # Remaining trading minutes
+    rem_minutes = len(nyse_minutes_between(as_of.ceil('min'), target_ts.floor('min')))
+    if rem_minutes < 1:
+        rem_minutes = 1
+
+    P0 = float(df_1m.loc[:as_of]["Close"].iloc[-1])
+    if P0 <= 0 or threshold_price <= 0:
+        raise ValueError("Prices must be positive.")
+
+    # Recent realized minute variance
+    recent = minute_log_returns(df_1m.loc[:as_of]["Close"]).tail(lookback_minutes)
+    if len(recent) < max(60, lookback_minutes // 3):
+        raise ValueError("Not enough recent minutes to estimate volatility.")
+    mu_hat = 0.0  # intraday drift ~ 0 for short horizons
+    sigma2_min = max(1e-12, float(np.var(recent, ddof=1)))  # per-minute variance
+    sigma_min = max(floor_sigma_per_min, math.sqrt(sigma2_min))
+
+    # Lognormal under iid minute returns
+    # r_total ~ N(mu*H, sigma^2 * H), with mu~=0
+    H = rem_minutes
+    m = (mu_hat - 0.5 * sigma_min**2) * H
+    s2 = (sigma_min**2) * H
+
+    # Compute P(S_T >= K) = 1 - Phi( (ln K - ln S0 - m)/sqrt(s2) )
+    z = (math.log(threshold_price) - math.log(P0) - m) / max(1e-12, math.sqrt(s2))
+    prob_above = 1.0 - 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))  # 1 - Phi(z)
+
+    return IntradayResult(
+        ticker=df_1m.attrs.get("ticker","UNKNOWN"),
+        as_of_ts=as_of, target_ts=target_ts,
+        remaining_minutes=H,
+        last_price=P0, threshold_price=threshold_price,
+        prob_above=float(np.clip(prob_above, 0.0, 1.0)),
+        method="iid_normal",
+        details={
+            "sigma_per_min": sigma_min,
+            "lookback_minutes": lookback_minutes,
+            "assumption": "iid minute log-returns, zero drift",
+        }
+    )
+
+# ---------- Engine B: Intraday block bootstrap (simulation) ----------
+
+def block_bootstrap_minute_paths(
+    minute_returns: np.ndarray,
+    H: int,
+    sims: int,
+    block: int = 10
+) -> np.ndarray:
+    n = len(minute_returns)
+    if n < block + H:
+        raise ValueError("Not enough minute history for block bootstrap.")
+    B = math.ceil(H / block)
+    starts = np.random.randint(0, n - block, size=(sims, B))
+    paths = []
+    for i in range(sims):
+        seg = np.concatenate([minute_returns[s:s+block] for s in starts[i]])
+        paths.append(seg[:H])
+    return np.vstack(paths)  # (sims, H)
+
+def prob_above_intra_bootstrap(
+    df_1m: pd.DataFrame,
+    threshold_price: float,
+    target_ts: pd.Timestamp,
+    as_of: Optional[pd.Timestamp] = None,
+    sims: int = 50000,
+    lookback_days: int = 5,
+    match_tod_window: int = 30,  # minutes around current time-of-day
+    block: int = 10
+) -> IntradayResult:
+    if as_of is None:
+        as_of = df_1m.index[-1]
+    as_of = pd.to_datetime(as_of).tz_convert(ET)
+    target_ts = pd.to_datetime(target_ts).tz_convert(ET)
+
+    o, c = nyse_session_bounds(as_of)
+    if not (o <= target_ts <= c):
+        raise ValueError("target_ts must be within the same trading session (regular hours).")
+    if target_ts <= as_of:
+        raise ValueError("target_ts must be in the future.")
+
+    rem_minutes = len(nyse_minutes_between(as_of.ceil('min'), target_ts.floor('min')))
+    if rem_minutes < 1:
+        rem_minutes = 1
+
+    P0 = float(df_1m.loc[:as_of]["Close"].iloc[-1])
+    if P0 <= 0 or threshold_price <= 0:
+        raise ValueError("Prices must be positive.")
+
+    # Build minute returns panel from the last N trading days
+    df = df_1m.copy()
+    df["date"] = df.index.date
+    unique_days = sorted(np.unique(df["date"]))[-lookback_days-1:-1]  # exclude current day
+    panel = []
+    for d in unique_days:
+        day_df = df[df["date"] == d]
+        panel.append(minute_log_returns(day_df["Close"]))
+    if not panel:
+        raise ValueError("Insufficient prior days for bootstrap.")
+    hist_r = pd.concat(panel).values
+
+    # Optional: time-of-day match (use minutes near the current minute)
+    current_minute = as_of.time()
+    # map minutes since open per day to align seasonality
+    # For simplicity, just restrict to a window around current minute-of-day index
+    day_open, _ = nyse_session_bounds(as_of)
+    minute_of_day_now = int((as_of - day_open).total_seconds() // 60)
+    hist_df = []
+    for d in unique_days:
+        do, dc = nyse_session_bounds(pd.Timestamp(d).tz_localize(ET))
+        day = df_1m[(df_1m.index >= do) & (df_1m.index <= dc)]
+        day["minute_idx"] = ((day.index - do).total_seconds() // 60).astype(int)
+        # keep a window around current minute index
+        mask = (day["minute_idx"] >= minute_of_day_now - match_tod_window) & \
+               (day["minute_idx"] <= minute_of_day_now + match_tod_window)
+        sel = minute_log_returns(day.loc[mask, "Close"])
+        hist_df.append(sel)
+    tod_returns = pd.concat(hist_df).values
+    # fallback to all history if too few points
+    base_returns = tod_returns if len(tod_returns) > 500 else hist_r
+
+    paths = block_bootstrap_minute_paths(base_returns, H=rem_minutes, sims=sims, block=block)
+    terminal_prices = P0 * np.exp(paths.sum(axis=1))
+    prob_above = float(np.mean(terminal_prices >= threshold_price))
+
+    return IntradayResult(
+        ticker=df_1m.attrs.get("ticker","UNKNOWN"),
+        as_of_ts=as_of, target_ts=target_ts,
+        remaining_minutes=rem_minutes,
+        last_price=P0, threshold_price=threshold_price,
+        prob_above=prob_above,
+        method="intra_bootstrap",
+        details={
+            "sims": sims,
+            "lookback_days": lookback_days,
+            "block": block,
+            "sampled_obs": int(len(base_returns)),
+            "tod_window_min": match_tod_window
+        }
+    )
+
+# ---------- Public API ----------
+
+def probability_above_level_intraday(
+    ticker: str,
+    threshold_price: float,
+    target_ts: str | pd.Timestamp,
+    method: Method = "iid_normal",
+    as_of: Optional[str | pd.Timestamp] = None,
+    **kwargs
+) -> IntradayResult:
+    """
+    Intraday probability that price will be >= threshold_price by target_ts (same session).
+    method:
+      - 'iid_normal': analytic lognormal using realized minute variance (fast)
+      - 'intra_bootstrap': block-bootstrap minute returns (robust)
+    kwargs:
+      iid_normal: lookback_minutes, floor_sigma_per_min
+      intra_bootstrap: sims, lookback_days, match_tod_window, block
+    """
+    df_1m = fetch_intraday_1m(ticker, days=kwargs.pop("days", 7))
+    df_1m.attrs["ticker"] = ticker
+    tgt = pd.to_datetime(target_ts).tz_localize(ET) if pd.Timestamp(target_ts).tzinfo is None else pd.to_datetime(target_ts).tz_convert(ET)
+    aof = None if as_of is None else (pd.to_datetime(as_of).tz_localize(ET) if pd.Timestamp(as_of).tzinfo is None else pd.to_datetime(as_of).tz_convert(ET))
+
+    if method == "iid_normal":
+        return prob_above_iid_normal(df_1m, threshold_price, tgt, as_of=aof, **kwargs)
+    elif method == "intra_bootstrap":
+        return prob_above_intra_bootstrap(df_1m, threshold_price, tgt, as_of=aof, **kwargs)
+    else:
+        raise ValueError("Unknown method. Use 'iid_normal' or 'intra_bootstrap'.")
